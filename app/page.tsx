@@ -68,7 +68,7 @@ export default function Home() {
             style={{ background: 'var(--accent-muted)', color: 'var(--accent)', border: '1px solid var(--accent-border)' }}
           >
             <Cpu size={12} />
-            Powered by Groq llama-4-scout · Free to use
+            Powered by Groq · Screenshot analysis
           </motion.div>
 
           <motion.h1

@@ -1,14 +1,17 @@
 import Groq from 'groq-sdk';
 import { NextRequest, NextResponse } from 'next/server';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.GROQ_API_KEY) return NextResponse.json({ error: 'Configure GROQ_API_KEY in the deployment environment.' }, { status: 503 });
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const formData = await req.formData();
     const image = formData.get('image') as File;
 
     if (!image) return NextResponse.json({ error: 'No image provided' }, { status: 400 });
+    if (!(image instanceof File) || !['image/jpeg', 'image/png', 'image/webp'].includes(image.type)) {
+      return NextResponse.json({ error: 'Upload a JPEG, PNG, or WebP image.' }, { status: 400 });
+    }
     if (image.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'Image too large (max 10MB)' }, { status: 400 });
 
     const bytes = await image.arrayBuffer();
@@ -16,7 +19,9 @@ export async function POST(req: NextRequest) {
     const mediaType = image.type as 'image/jpeg' | 'image/png' | 'image/webp';
 
     const response = await groq.chat.completions.create({
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      // GPT-OSS is text-only. Use the supported multimodal replacement for screenshots.
+      model: process.env.GROQ_VISION_MODEL || 'qwen/qwen3.8-27b',
+      reasoning_effort: 'none',
       max_tokens: 4096,
       messages: [
         {

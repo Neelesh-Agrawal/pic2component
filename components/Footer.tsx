@@ -18,7 +18,7 @@ export default function Footer() {
           Pic2<span style={{ color: 'var(--accent)' }}>Component</span>
         </span>
         <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          · Built with Groq llama-4-scout
+          · Built with Groq vision
         </span>
       </div>
 
